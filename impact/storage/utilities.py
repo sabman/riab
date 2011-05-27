@@ -9,7 +9,9 @@ import cgi
 from urllib import urlencode
 from urllib2 import urlopen
 from owslib.etree import etree
-
+from owslib.wfs import WebFeatureService
+from owslib.wcs import WebCoverageService
+ 
 # The projection string depends on the gdal version
 DEFAULT_PROJECTION = '+proj=longlat +datum=WGS84 +no_defs'
 
@@ -29,6 +31,34 @@ TYPE_MAP = {type(''): ogr.OFTString,
             type(0.0): ogr.OFTReal,
             type(numpy.array([0.0])[0]): ogr.OFTReal,  # numpy.float64
             type(numpy.array([[0.0]])[0]): ogr.OFTReal}  # numpy.ndarray
+
+ 
+def get_wfs(server_url, version='1.0.0'):
+    """Get Web Feature Service (WFS) handler.
+  
+    Input:
+       server_url: URL for web feature service. E.g. http://www.aifdr.org:8080/geoserver/ows?
+  
+    Output:
+       WebFeatureService object
+    """
+  
+    wfs = WebFeatureService(server_url, version=version)
+    return wfs
+
+
+def get_wcs(server_url, version='1.1.1'):
+    """Get coverage from Web Coverage Service (WCS) in GeoTIFF format.
+  
+    Input:
+       server_url: URL for web ceature service. E.g. http://www.aifdr.org:8080/geoserver/ows?
+    Output:
+       WebCoverageService object
+    """
+  
+    wcs = WebCoverageService(server_url, version=version)
+    return wcs
+  
 
 
 # Miscellaneous auxiliary functions
@@ -83,7 +113,7 @@ def get_layers_metadata(url, version='1.0.0'):
     msg = ('Server %s is not reachable' % url)
     if not is_server_reachable(url):
         raise Exception(msg)
-   
+
     wcs_reader = MetadataReader(url, 'wcs', version)
     wfs_reader = MetadataReader(url, 'wfs', version)
     layers = []
