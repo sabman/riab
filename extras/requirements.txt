@@ -1,5 +1,5 @@
 coverage==3.4
-Django==1.2
+Django==2.2.24
 django-avatar==2.0a1
 django-extensions==0.6
 django-nose==0.1.2
